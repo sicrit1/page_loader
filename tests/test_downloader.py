@@ -1,6 +1,4 @@
 import os
-import requests
-import requests_mock
 from pathlib import Path
 from page_loader.downloader import download, urlfy
 import pytest
@@ -24,10 +22,15 @@ def test_downloader(tmpdir, requests_mock):
     result = (Path(full_result_path)).read_bytes()
     assert result == download_data
 
+
 @pytest.mark.parametrize(
     'path_to_download, path_to_save, result',
     [
-        ('https://ru.hexlet.io/courses', '/var/tmp', '/var/tmp/ru-hexlet-io-courses.html'),
+        (
+            'https://ru.hexlet.io/courses',
+            '/var/tmp',
+            '/var/tmp/ru-hexlet-io-courses.html',
+        ),
     ],
 )
 def test_urlfy(path_to_download, path_to_save, result):

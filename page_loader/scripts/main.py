@@ -9,9 +9,13 @@ def parser_html():
         description='This utility download a page from the Internet'
         'and save it local'
     )
-    parser.add_argument('path_to_html', type=str, help='Input adress to download a html')
     parser.add_argument(
-        '-o', 
+        'path_to_html',
+        type=str,
+        help='Input adress to download a html',
+    )
+    parser.add_argument(
+        '-o',
         '--output',
         type=str,
         default=pwd_path,
