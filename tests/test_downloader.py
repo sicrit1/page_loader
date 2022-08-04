@@ -7,11 +7,15 @@ import pytest
 
 URL_TO_RESPONSE = {
     'html': 'https://ru.hexlet.io/courses',
-    'img': 'https://ru.hexlet.io/assets/professions/nodejs.png',
+    'img': '/assets/professions/nodejs.png',
+    'script': 'https://ru.hexlet.io/packs/js/runtime.js',
+    'link': '/assets/application.css',
 }
 TEST_FILE_NAME = {
     'html': 'test_file_to_download.html',
     'img': 'test_picture.png',
+    'script': 'test_file_script.js',
+    'link': 'test_file_link.css',
     'changed_html': 'test_file_changed.html',
 }
 
@@ -26,8 +30,14 @@ def test_downloader(tmpdir, requests_mock):
     download_html = (Path(path_to_html)).read_bytes()
     path_to_img = get_path(TEST_FILE_NAME['img'])
     download_img = (Path(path_to_img)).read_bytes()
+    path_to_link = get_path(TEST_FILE_NAME['link'])
+    download_link = (Path(path_to_link)).read_bytes()
+    path_to_script = get_path(TEST_FILE_NAME['script'])
+    download_script = (Path(path_to_script)).read_bytes()
     requests_mock.get(URL_TO_RESPONSE['html'], content=download_html)
     requests_mock.get(URL_TO_RESPONSE['img'], content=download_img)
+    requests_mock.get(URL_TO_RESPONSE['link'], content=download_link)
+    requests_mock.get(URL_TO_RESPONSE['script'], content=download_script)
 
     full_result_path = download(URL_TO_RESPONSE['html'], tmpdir)
     result_data = (Path(full_result_path)).read_bytes()
@@ -39,14 +49,27 @@ def test_downloader(tmpdir, requests_mock):
 
 
 @pytest.mark.parametrize(
-    'path_to_download, result',
+    'path_to_download, result, is_dir',
     [
         (
             'https://ru.hexlet.io/courses',
-            'ru-hexlet-io-courses',
+            'ru-hexlet-io-courses.html',
+            False,
         ),
+        (
+            'https://ru.hexlet.io/courses/runtime.js',
+            'ru-hexlet-io-courses-runtime.js',
+            False,
+        ),
+        (
+            'https://ru.hexlet.io/courses',
+            'ru-hexlet-io-courses_files',
+            True,
+        ),
+
+
     ],
 )
-def test_local_name(path_to_download, result):
-    test_path = local_name(path_to_download)
+def test_local_name(path_to_download, result, is_dir):
+    test_path = local_name(path_to_download, is_dir)
     assert result == test_path

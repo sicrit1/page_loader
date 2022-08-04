@@ -1,0 +1,14 @@
+@charset "utf-8";/*!
+ * Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license (Commercial License)
+ * Copyright 2022 Fonticons, Inc.
+ */pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/.hljs{background:#fff;color:#24292e}.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword

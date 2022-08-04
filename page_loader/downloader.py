@@ -8,14 +8,13 @@ from urllib.parse import urljoin, urlparse
 from pathlib import Path
 
 
-TAGS = ('img')
+TAGS = ('img', 'link', 'script')
 
 
 def download(path_to_download, path_to_save):
     download_data = requests.get(path_to_download)
-    right_name = local_name(path_to_download)
-    local_name_html = f'{right_name}.html'
-    files_dir_name = f'{right_name}_files'
+    local_name_html = local_name(path_to_download)
+    files_dir_name = local_name(path_to_download, is_dir=True)
     local_html, link_to_download = get_content(
         download_data.text,
         path_to_download,
@@ -27,15 +26,19 @@ def download(path_to_download, path_to_save):
     return str(path_to_local_html)
 
 
-def local_name(path_to_download):
+def local_name(path_to_download, is_dir=False):
     path_without_http = path_to_download.split('://')[1]
     suff = Path(path_without_http).suffix
     true_name = re.sub(
         r"[^\w\s]", '-',
         str(Path(path_without_http).with_suffix('')),
     )
-    if suff != '':
+    if is_dir:
+        true_name = f'{true_name}_files'
+    elif suff != '':
         true_name = f'{true_name}{suff}'
+    else:
+        true_name = f'{true_name}.html'
     return true_name
 
 
@@ -55,7 +58,9 @@ def get_content(download_data, path_to_download, files_dir_name):
 
 def get_source(tag):
     source_dic = {
-        'img': 'src'
+        'img': 'src',
+        'script': 'src',
+        'link': 'href',
     }
     return source_dic.get(tag)
 
