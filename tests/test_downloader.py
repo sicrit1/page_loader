@@ -40,11 +40,11 @@ def test_downloader(tmpdir, requests_mock):
     requests_mock.get(URL_TO_RESPONSE['script'], content=download_script)
 
     full_result_path = download(URL_TO_RESPONSE['html'], tmpdir)
-    result_data = (Path(full_result_path)).read_bytes()
+    result_data = Path(full_result_path).read_bytes()
     path_to_expected_data = get_path(TEST_FILE_NAME['changed_html'])
-    expected_data = (Path(path_to_expected_data)).read_bytes()
-    expected_html = BeautifulSoup(expected_data, 'html.parser').prettify(formatter='html5')  # noqa: E501
-    result_html = BeautifulSoup(result_data, 'html.parser').prettify(formatter='html5')  # noqa: E501
+    expected_data = Path(path_to_expected_data).read_bytes()
+    expected_html = BeautifulSoup(expected_data, 'html.parser').prettify()
+    result_html = BeautifulSoup(result_data, 'html.parser').prettify()
     assert expected_html == result_html
 
 
