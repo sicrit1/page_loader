@@ -24,3 +24,6 @@ coverage:
 
 cc-coverage:
 	poetry run pytest --cov=page_loader --cov-report xml
+
+lint-tests:
+	poetry run pytest tests

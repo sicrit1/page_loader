@@ -6,7 +6,6 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from pathlib import Path
-import logging
 from page_loader import app_logger
 
 
@@ -20,14 +19,13 @@ def download(path_to_download, path_to_save):
     download_data = requests.get(path_to_download)
     local_name_html = local_name(path_to_download)
     files_dir_name = local_name(path_to_download, is_dir=True)
-    path_to_files_dir = Path(path_to_save, files_dir_name)
     path_to_local_html = Path(path_to_save, local_name_html)
     local_html, link_to_download = get_content(
         download_data.text,
         path_to_download,
-        path_to_files_dir,
+        files_dir_name,
     )
-    download_content(link_to_download, path_to_files_dir)
+    download_content(link_to_download, Path(path_to_save, files_dir_name))
     Path(path_to_local_html).write_text(local_html)
     logger.info(f'Finish downloading. Page has been saved to {path_to_save}')
     return str(path_to_local_html)
@@ -49,7 +47,7 @@ def local_name(path_to_download, is_dir=False):
     return true_name
 
 
-def get_content(download_data, path_to_download, path_to_files_dir):
+def get_content(download_data, path_to_download, files_dir_name):
     soup = BeautifulSoup(download_data, 'html.parser')
     link_to_download = {}
     for tag in soup.find_all(TAGS):
@@ -57,9 +55,9 @@ def get_content(download_data, path_to_download, path_to_files_dir):
         full_path_to_content = urljoin(path_to_download, tag.get(source))
         if urlparse(full_path_to_content).netloc == urlparse(path_to_download).netloc:  # noqa E501
             content_name = local_name(full_path_to_content)
-            path_to_save_content = Path(path_to_files_dir, content_name)
-            link_to_download[full_path_to_content] = path_to_save_content
-            tag[source] = path_to_save_content
+            path_to_saved_content = Path(files_dir_name, content_name)
+            link_to_download[full_path_to_content] = content_name
+            tag[source] = path_to_saved_content
     local_html = soup.prettify()
     return local_html, link_to_download
 
@@ -74,12 +72,12 @@ def get_source(tag):
 
 
 def download_content(link_to_download, path_to_files_dir):  # noqa: C901
-    logger.info(f'Start downloading local resources')
+    logger.info(f'{"Start downloading local resources"}')
     Path(path_to_files_dir).mkdir()
-    for full_path_to_content, path_to_save_content in link_to_download.items():
+    for full_path_to_content, content_name in link_to_download.items():
         try:
             response = requests.get(full_path_to_content, stream=True)
-            with open(path_to_save_content, 'wb') as f:
+            with open(Path(path_to_files_dir, content_name), 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     if chunk:
                         f.write(chunk)
@@ -93,5 +91,5 @@ def download_content(link_to_download, path_to_files_dir):  # noqa: C901
             print("OOps: Something Else", err)
     logger.info(
         f'Finish downloading resources.'
-        f'Resources have been saved to {path_to_save_content}'
+        f'Resources have been saved to {path_to_files_dir}'
     )
