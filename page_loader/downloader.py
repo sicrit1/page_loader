@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from pathlib import Path
 from page_loader import app_logger
+from page_loader.download_content import download_content
 
 
 TAGS = ('img', 'link', 'script')
@@ -78,27 +79,3 @@ def get_source(tag):
         'link': 'href',
     }
     return source_dic.get(tag)
-
-
-def download_content(link_to_download, path_to_files_dir):  # noqa: C901
-    logger.info(f'{"Start downloading local resources"}')
-    Path(path_to_files_dir).mkdir()
-    for full_path_to_content, content_name in link_to_download.items():
-        try:
-            response = requests.get(full_path_to_content, stream=True)
-            with open(Path(path_to_files_dir, content_name), 'wb') as f:
-                for chunk in response.iter_content(chunk_size=1024):
-                    if chunk:
-                        f.write(chunk)
-        except requests.exceptions.HTTPError as errh:
-            print("Http Error:", errh)
-        except requests.exceptions.ConnectionError as errc:
-            print("Error Connecting:", errc)
-        except requests.exceptions.Timeout as errt:
-            print("Timeout Error:", errt)
-        except requests.exceptions.RequestException as err:
-            print("OOps: Something Else", err)
-    logger.info(
-        f'Finish downloading resources.'
-        f'Resources have been saved to {path_to_files_dir}'
-    )

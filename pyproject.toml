@@ -16,6 +16,7 @@ bs4 = "^0.0.1"
 pytest-cov = "^3.0.0"
 pook = "^1.0.2"
 requests-mock = "^1.9.3"
+progress = "^1.6"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"

@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from page_loader.downloader import download, local_name
+from page_loader.download_content import download_content
 from bs4 import BeautifulSoup
 import pytest
 
@@ -82,3 +83,18 @@ def test_status_code(requests_mock, tmpdir, status_code):
     requests_mock.get(URL_TO_RESPONSE['html'], status_code=status_code)
     with pytest.raises(Exception):
         download(URL_TO_RESPONSE['html'], tmpdir)
+
+
+@pytest.mark.parametrize(
+    'exception, request_dic',
+    [
+        ('requests.exceptions.HTTPError', {'https': 'name'}),
+        ('requests.exceptions.ConnectionError', {'https': 'name'}),
+        ('requests.exceptions.Timeout', {'https': 'name'}),
+        ('requests.exceptions.RequestException', {'https': 'name'}),
+    ]
+)
+def tes_download_content(request_mock, tmdir, exception, request_dic):
+    request_mock.get((''.join(list(request_dic))), exception=exception)
+    with pytest.raises(Exception):
+        download_content(request_dic, tmdir)
