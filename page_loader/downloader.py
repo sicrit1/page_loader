@@ -16,7 +16,7 @@ logger = app_logger.get_logger(__name__)
 
 def download(path_to_download, path_to_save):
     logger.info(f'Start downloading {path_to_download}')
-    download_data = requests.get(path_to_download)
+    download_data = request_http(path_to_download)
     local_name_html = local_name(path_to_download)
     files_dir_name = local_name(path_to_download, is_dir=True)
     path_to_local_html = Path(path_to_save, local_name_html)
@@ -29,6 +29,15 @@ def download(path_to_download, path_to_save):
     Path(path_to_local_html).write_text(local_html)
     logger.info(f'Finish downloading. Page has been saved to {path_to_save}')
     return str(path_to_local_html)
+
+
+def request_http(path_to_download):
+    download_data = requests.get(path_to_download)
+    if download_data.status_code != 200:
+        raise Exception(
+            'Error. Status code = {}.format(download_data.status_code)'
+        )
+    return download_data
 
 
 def local_name(path_to_download, is_dir=False):

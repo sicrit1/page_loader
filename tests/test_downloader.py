@@ -73,3 +73,12 @@ def test_downloader(tmpdir, requests_mock):
 def test_local_name(path_to_download, result, is_dir):
     test_path = local_name(path_to_download, is_dir)
     assert result == test_path
+
+
+@pytest.mark.parametrize('status_code', [
+    400, 401, 403, 404, 500, 502,
+])
+def test_status_code(requests_mock, tmpdir, status_code):
+    requests_mock.get(URL_TO_RESPONSE['html'], status_code=status_code)
+    with pytest.raises(Exception):
+        download(URL_TO_RESPONSE['html'], tmpdir)
